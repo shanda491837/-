@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.1" halcon_version="12.0">
+<procedure name="main">
+<interface/>
+<body>
+<c as_id="image_acquisition" as_name="Image Acquisition 01" as_grp="[1,1]" as_ord="1">*图虫图片去重</c>
+<l>if(true)</l>
+<l>    list_files ('E:/图虫视频', ['files','follow_links'], ImageFiles)</l>
+<l>tuple_regexp_select (ImageFiles, ['\\.(tif|tiff|gif|bmp|jpg|jpeg|jp2|png|pcx|pgm|ppm|pbm|xwd|ima|hobj)$','ignore_case'], ImageFiles)</l>
+<l>for Index := 1 to |ImageFiles| - 1 by 1</l>
+<l>    try</l>
+<l>        read_image (Image, ImageFiles[Index])</l>
+<l>    read_image (Image0, ImageFiles[Index-1])</l>
+<l>    sub_image(Image0, Image, ImageSub, 1, 0)</l>
+<l> threshold (ImageSub, Region, 128, 254)</l>
+<c></c>
+<l> connection (Region, ConnectedRegions)</l>
+<l>select_shape (ConnectedRegions, SelectedRegions, 'area', 'and', 0, 99999999)</l>
+<l> count_obj (SelectedRegions, Number)</l>
+<l> if(Number==1)</l>
+<l>      delete_file (ImageFiles[Index-1])</l>
+<l> endif</l>
+<c>   *</c>
+<c>    * Image Acquisition 01: Do something   </c>
+<l>    catch (Exception)</l>
+<c>        </c>
+<l>    endtry</l>
+<c> </c>
+<l>endfor</l>
+<l>endif</l>
+<c></c>
+<c></c>
+<l>if(false)</l>
+<c>*截取的图片把黑色边缘去除掉</c>
+<l>list_files ('E:/图虫视频', ['files','follow_links'], ImageFiles)</l>
+<l>tuple_regexp_select (ImageFiles, ['\\.(tif|tiff|gif|bmp|jpg|jpeg|jp2|png|pcx|pgm|ppm|pbm|xwd|ima|hobj)$','ignore_case'], ImageFiles)</l>
+<l>for Index := 0 to |ImageFiles| - 1 by 1</l>
+<l>    try</l>
+<l>        read_image (Image, ImageFiles[Index])  </l>
+<l> threshold (Image, Region,50, 255)</l>
+<l>connection (Region, ConnectedRegions1)</l>
+<l>select_shape (ConnectedRegions1, SelectedRegions, 'area', 'and', 100000, 99999999)</l>
+<l>fill_up (SelectedRegions, RegionFillUp)</l>
+<l> shape_trans (RegionFillUp, RegionTrans, 'rectangle1')</l>
+<l> reduce_domain (Image, RegionTrans, ImageReduced)</l>
+<l> crop_domain (ImageReduced, ImagePart)</l>
+<l> write_image (ImagePart, 'jpeg', 0,'E:/图虫视频/a'+Index)</l>
+<c>    * Image Acquisition 01: Do something   </c>
+<l>    catch (Exception)</l>
+<c>        </c>
+<l>    endtry</l>
+<l>endfor</l>
+<l>endif</l>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>
